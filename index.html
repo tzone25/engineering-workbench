@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Engineering Workbench">
+<title>Engineering Workbench</title>
+
+<style>
+:root{
+  --bg:#0b1120;
+  --panel:#111827;
+  --panel2:#172033;
+  --text:#f8fafc;
+  --muted:#94a3b8;
+  --line:#263449;
+  --accent:#38bdf8;
+  --accent2:#0ea5e9;
+  --danger:#ef4444;
+  --warning:#f59e0b;
+  --success:#22c55e;
+  --radius:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+body{min-height:100vh}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{display:flex;min-height:100vh}
+.sidebar{
+  width:250px;background:#080d18;border-right:1px solid var(--line);
+  position:fixed;left:0;top:0;bottom:0;padding:18px 12px;overflow-y:auto;z-index:20
+}
+.brand{padding:8px 10px 20px}
+.brand h1{font-size:20px;margin:0 0 5px}
+.brand p{font-size:12px;color:var(--muted);margin:0}
+.nav button{
+  width:100%;border:0;background:transparent;color:#cbd5e1;
+  padding:12px 13px;margin:3px 0;text-align:left;border-radius:11px
+}
+.nav button:hover,.nav button.active{background:var(--panel2);color:white}
+.nav-group{font-size:10px;color:#64748b;text-transform:uppercase;padding:16px 12px 5px}
+.main{margin-left:250px;width:calc(100% - 250px);padding:22px}
+.mobile-top{display:none}
+.page{display:none}
+.page.active{display:block}
+.header{
+  display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:20px
+}
+.header h2{margin:0;font-size:25px}
+.header p{margin:5px 0 0;color:var(--muted)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{
+  border:1px solid var(--line);background:var(--panel2);color:white;
+  padding:10px 14px;border-radius:10px
+}
+.btn:hover{filter:brightness(1.15)}
+.btn.primary{background:var(--accent2);border-color:var(--accent2)}
+.btn.success{background:#166534;border-color:#166534}
+.btn.danger{background:#991b1b;border-color:#991b1b}
+.btn.warning{background:#92400e;border-color:#92400e}
+.grid{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px
+}
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:17px
+}
+.stat .label{color:var(--muted);font-size:13px}
+.stat .value{font-size:30px;font-weight:bold;margin-top:8px}
+.stat .sub{font-size:12px;color:var(--muted);margin-top:5px}
+.section-title{font-size:17px;font-weight:bold;margin:25px 0 12px}
+.quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.quick{
+  text-align:left;background:var(--panel);border:1px solid var(--line);
+  color:white;border-radius:14px;padding:18px
+}
+.quick strong{display:block;margin-bottom:7px}
+.quick span{font-size:12px;color:var(--muted)}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}
+table{width:100%;border-collapse:collapse;min-width:650px}
+th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}
+th{color:#cbd5e1;background:#0d1525}
+td{color:#e2e8f0}
+.badge{
+  display:inline-block;padding:4px 8px;border-radius:99px;font-size:11px;
+  background:#334155;color:white
+}
+.badge.success{background:#14532d}
+.badge.warning{background:#78350f}
+.badge.danger{background:#7f1d1d}
+.badge.info{background:#075985}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
+.field label{display:block;font-size:12px;color:#cbd5e1;margin-bottom:6px}
+.field input,.field select,.field textarea{
+  width:100%;background:#0b1220;color:white;border:1px solid var(--line);
+  border-radius:10px;padding:11px
+}
+.field textarea{min-height:100px;resize:vertical}
+.full{grid-column:1/-1}
+.modal{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
+  z-index:50;align-items:center;justify-content:center;padding:18px
+}
+.modal.open{display:flex}
+.modal-box{
+  width:min(720px,100%);max-height:90vh;overflow:auto;
+  background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px
+}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.modal-head h3{margin:0}
+.close{background:none;border:0;color:white;font-size:25px}
+.calc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.result{
+  margin-top:15px;padding:15px;border:1px solid var(--line);
+  border-radius:12px;background:#0b1220
+}
+.result strong{font-size:22px}
+.tool-card h3{margin-top:0}
+.note{font-size:12px;color:var(--muted);line-height:1.5}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+.list{display:grid;gap:10px}
+.list-item{
+  background:#0d1525;border:1px solid var(--line);padding:13px;border-radius:12px
+}
+.search{
+  width:100%;background:#0b1220;border:1px solid var(--line);color:white;
+  padding:12px;border-radius:10px;margin-bottom:12px
+}
+.signature{
+  border:1px dashed #475569;border-radius:10px;padding:15px;
+  color:var(--muted);margin-top:10px
+}
+.footer{text-align:center;color:#64748b;font-size:11px;padding:35px 0}
+@media(max-width:950px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .calc-grid{grid-template-columns:repeat(2,1fr)}
+  .quick-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:700px){
+  .sidebar{
+    transform:translateX(-100%);transition:.2s;width:270px
+  }
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;width:100%;padding:14px;padding-top:70px}
+  .mobile-top{
+    display:flex;position:fixed;top:0;left:0;right:0;height:58px;
+    background:#080d18;border-bottom:1px solid var(--line);
+    z-index:15;align-items:center;padding:8px 12px;justify-content:space-between
+  }
+  .mobile-top button{background:var(--panel2);color:white;border:1px solid var(--line);border-radius:9px;padding:8px 12px}
+  .header{align-items:flex-start;flex-direction:column}
+  .grid,.form-grid,.calc-grid,.quick-grid{grid-template-columns:1fr}
+  .full{grid-column:auto}
+}
+</style>
+</head>
+
+<body>
+
+<div class="mobile-top">
+  <strong>⚙️ Engineering Workbench</strong>
+  <button onclick="toggleSidebar()">☰</button>
+</div>
+
+<div class="app">
+
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <h1>⚙️ Engineering Workbench</h1>
+    <p>Mechanical • Hydraulic • Maintenance</p>
+  </div>
+
+  <div class="nav">
+    <button class="active" onclick="showPage('dashboard',this)">🏠 Dashboard</button>
+
+    <div class="nav-group">Asset Management</div>
+    <button onclick="showPage('machines',this)">🏭 Machines</button>
+    <button onclick="showPage('components',this)">⚙️ Components</button>
+    <button onclick="showPage('parts',this)">📦 Parts & Inventory</button>
+
+    <div class="nav-group">Maintenance</div>
+    <button onclick="showPage('maintenance',this)">🔧 Maintenance</button>
+    <button onclick="showPage('faults',this)">⚠️ Fault Finding</button>
+    <button onclick="showPage('safety',this)">🦺 Safety</button>
+    <button onclick="showPage('jobs',this)">📋 Jobs</button>
+
+    <div class="nav-group">Engineering</div>
+    <button onclick="showPage('calculators',this)">🧮 Calculators</button>
+    <button onclick="showPage('hydraulics',this)">💧 Hydraulics</button>
+    <button onclick="showPage('mechanical',this)">⚙️ Mechanical</button>
+    <button onclick="showPage('machining',this)">🔩 Machining</button>
+    <button onclick="showPage('conversions',this)">📐 Unit Converter</button>
+
+    <div class="nav-group">Records</div>
+    <button onclick="showPage('reports',this)">📊 Reports</button>
+    <button onclick="showPage('timeline',this)">🕒 Machine Timeline</button>
+    <button onclick="showPage('reference',this)">📚 Reference</button>
+
+    <div class="nav-group">System</div>
+    <button onclick="showPage('backup',this)">💾 Backup & Data</button>
+  </div>
+</aside>
+
+<main class="main">
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="page active">
+  <div class="header">
+    <div>
+      <h2>Engineering Command Centre</h2>
+      <p>Mechanical engineering, maintenance and fault-finding workbench.</p>
+    </div>
+    <div class="actions">
+      <button class="btn primary" onclick="openMachineModal()">+ Machine</button>
+      <button class="btn warning" onclick="openFaultModal()">+ Fault</button>
+      <button class="btn success" onclick="openMaintenanceModal()">+ Maintenance</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card stat"><div class="label">Machines</div><div class="value" id="statMachines">0</div><div class="sub">Registered assets</div></div>
+    <div class="card stat"><div class="label">Open Faults</div><div class="value" id="statFaults">0</div><div class="sub">Requires investigation</div></div>
+    <div class="card stat"><div class="label">Maintenance Jobs</div><div class="value" id="statMaintenance">0</div><div class="sub">Recorded jobs</div></div>
+    <div class="card stat"><div class="label">Safety Records</div><div class="value" id="statSafety">0</div><div class="sub">Checks completed</div></div>
+  </div>
+
+  <div class="section-title">Quick Engineering Tools</div>
+  <div class="quick-grid">
+    <button class="quick" onclick="showPage('calculators')"><strong>🧮 Engineering Calculator</strong><span>Force, torque, power, stress and more.</span></button>
+    <button class="quick" onclick="showPage('hydraulics')"><strong>💧 Hydraulic Calculator</strong><span>Cylinder force, flow, speed and power.</span></button>
+    <button class="quick" onclick="showPage('machining')"><strong>🔩 Machining Calculator</strong><span>RPM, cutting speed and feed.</span></button>
+    <button class="quick" onclick="showPage('faults')"><strong>⚠️ Fault Finder</strong><span>Structured mechanical and hydraulic diagnosis.</span></button>
+    <button class="quick" onclick="showPage('safety')"><strong>🦺 Safety Check</strong><span>Record isolation and stored-energy checks.</span></button>
+    <button class="quick" onclick="showPage('reports')"><strong>📊 Reports</strong><span>Review maintenance and engineering records.</span></button>
+  </div>
+
+  <div class="section-title">Recent Activity</div>
+  <div class="card">
+    <div id="recentActivity" class="list"></div>
+  </div>
+</section>
+
+<!-- MACHINES -->
+<section id="machines" class="page">
+  <div class="header">
+    <div><h2>Machines & Assets</h2><p>Maintain a complete digital record for every machine.</p></div>
+    <button class="btn primary" onclick="openMachineModal()">+ Add Machine</button>
+  </div>
+  <input class="search" placeholder="Search machines..." oninput="renderMachines(this.value)">
+  <div class="card"><div id="machinesTable"></div></div>
+</section>
+
+<!-- COMPONENTS -->
+<section id="components" class="page">
+  <div class="header">
+    <div><h2>Components</h2><p>Track pumps, bearings, cylinders, motors, valves and other components.</p></div>
+    <button class="btn primary" onclick="openComponentModal()">+ Add Component</button>
+  </div>
+  <div class="card"><div id="componentsTable"></div></div>
+</section>
+
+<!-- PARTS -->
+<section id="parts" class="page">
+  <div class="header">
+    <div><h2>Parts & Inventory</h2><p>Track parts, quantities and minimum stock levels.</p></div>
+    <button class="btn primary" onclick="openPartModal()">+ Add Part</button>
+  </div>
+  <div class="card"><div id="partsTable"></div></div>
+</section>
+
+<!-- MAINTENANCE -->
+<section id="maintenance" class="page">
+  <div class="header">
+    <div><h2>Maintenance</h2><p>Preventive, corrective and breakdown maintenance records.</p></div>
+    <button class="btn primary" onclick="openMaintenanceModal()">+ Record Maintenance</button>
+  </div>
+  <div class="card"><div id="maintenanceTable"></div></div>
+</section>
+
+<!-- FAULTS -->
+<section id="faults" class="page">
+  <div class="header">
+    <div><h2>Fault Finding</h2><p>Record symptoms, diagnostic checks, causes and corrective actions.</p></div>
+    <button class="btn warning" onclick="openFaultModal()">+ New Fault</button>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>💧 Hydraulic Diagnosis</h3>
+      <p class="note">Use a structured approach: symptom → pressure → flow → component → cause.</p>
+      <button class="btn" onclick="loadDiagnostic('hydraulic')">Start Diagnostic</button>
+    </div>
+    <div class="card">
+      <h3>⚙️ Mechanical Diagnosis</h3>
+      <p class="note">Bearings, shafts, alignment, lubrication, vibration and mechanical failures.</p>
+      <button class="btn" onclick="loadDiagnostic('mechanical')">Start Diagnostic</button>
+    </div>
+    <div class="card">
+      <h3>💨 Pneumatic Diagnosis</h3>
+      <p class="note">Pressure, flow, leaks, valves, cylinders and air supply.</p>
+      <button class="btn" onclick="loadDiagnostic('pneumatic')">Start Diagnostic</button>
+    </div>
+  </div>
+
+  <div class="section-title">Recorded Faults</div>
+  <div class="card"><div id="faultsTable"></div></div>
+</section>
+
+<!-- SAFETY -->
+<section id="safety" class="page">
+  <div class="header">
+    <div><h2>Safety & Sign-Off</h2><p>Record job safety checks and authorisation.</p></div>
+    <button class="btn success" onclick="openSafetyModal()">+ Safety Record</button>
+  </div>
+
+  <div class="card">
+    <h3>🦺 Mechanical / Hydraulic Safety Checklist</h3>
+    <div class="form-grid">
+      <div class="field"><label>Machine</label><select id="safetyMachine"></select></div>
+      <div class="field"><label>Job / Task</label><input id="safetyTask" placeholder="Describe task"></div>
+      <div class="field full"><label>Hazards identified</label><textarea id="safetyHazards" placeholder="Rotating parts, stored hydraulic energy, gravity, heat, sharp edges..."></textarea></div>
+    </div>
+    <br>
+    <div class="grid">
+      <div class="card"><label><input type="checkbox" class="safeCheck"> Machine identified</label></div>
+      <div class="card"><label><input type="checkbox" class="safeCheck"> Isolation completed</label></div>
+      <div class="card"><label><input type="checkbox" class="safeCheck"> Stored energy released</label></div>
+      <div class="card"><label><input type="checkbox" class="safeCheck"> Zero-energy verified</label></div>
+      <div class="card"><label><input type="checkbox" class="safeCheck"> Guards considered</label></div>
+      <div class="card"><label><input type="checkbox" class="safeCheck"> Correct PPE</label></div>
+    </div>
+    <div class="signature">
+      <strong>Sign-off</strong><br><br>
+      Person performing work: <input id="safetyPerson" style="background:#0b1220;color:white;border:1px solid #263449;padding:8px;border-radius:7px">
+      <br><br>
+      <button class="btn success" onclick="saveSafety()">Save Safety Record</button>
+    </div>
+  </div>
+
+  <div class="section-title">Safety Records</div>
+  <div class="card"><div id="safetyTable"></div></div>
+</section>
+
+<!-- JOBS -->
+<section id="jobs" class="page">
+  <div class="header">
+    <div><h2>Jobs</h2><p>Central job register.</p></div>
+    <button class="btn primary" onclick="openJobModal()">+ New Job</button>
+  </div>
+  <div class="card"><div id="jobsTable"></div></div>
+</section>
+
+<!-- CALCULATORS -->
+<section id="calculators" class="page">
+  <div class="header">
+    <div><h2>Engineering Calculators</h2><p>Core mechanical engineering calculations.</p></div>
+  </div>
+
+  <div class="calc-grid">
+
+    <div class="card tool-card">
+      <h3>Force</h3>
+      <div class="field"><label>Mass (kg)</label><input id="forceMass" type="number"></div><br>
+      <div class="field"><label>Acceleration (m/s²)</label><input id="forceAccel" type="number" value="9.81"></div>
+      <button class="btn primary" onclick="calcForce()">Calculate</button>
+      <div class="result" id="forceResult">Result</div>
+    </div>
+
+    <div class="card tool-card">
+      <h3>Torque</h3>
+      <div class="field"><label>Force (N)</label><input id="torqueForce" type="number"></div><br>
+      <div class="field"><label>Lever arm (m)</label><input id="torqueArm" type="number"></div>
+      <button class="btn primary" onclick="calcTorque()">Calculate</button>
+      <div class="result" id="torqueResult">Result</div>
+    </div>
+
+    <div class="card tool-card">
+      <h3>Power from Torque</h3>
+      <div class="field"><label>Torque (Nm)</label><input id="powerTorque" type="number"></div><br>
+      <div class="field"><label>RPM</label><input id="powerRpm" type="number"></div>
+      <button class="btn primary" onclick="calcPower()">Calculate</button>
+      <div class="result" id="powerResult">Result</div>
+    </div>
+
+    <div class="card tool-card">
+      <h3>Shaft Stress</h3>
+      <div class="field"><label>Torque (Nm)</label><input id="shaftTorque" type="number"></div><br>
+      <div class="field"><label>Shaft diameter (mm)</label><input id="shaftDiameter" type="number"></div>
+      <button class="btn primary" onclick="calcShaftStress()">Calculate</button>
+      <div class="result" id="shaftResult">Result</div>
+    </div>
+
+    <div class="card tool-card">
+      <h3>Gear Ratio</h3>
+      <div class="field"><label>Driver teeth</label><input id="gearDriver" type="number"></div><br>
+      <div class="field"><label>Driven teeth</label><input id="gearDriven" type="number"></div>
+      <button class="btn primary" onclick="calcGear()">Calculate</button>
+      <div class="result" id="gearResult">Result</div>
+    </div>
+
+    <div class="card tool-card">
+      <h3>Linear Speed</h3>
+      <div class="field"><label>RPM</label><input id="linearRpm" type="number"></div><br>
+      <div class="field"><label>Diameter (mm)</label><input id="linearDia" type="number"></div>
+      <button class="btn primary" onclick="calcLinear()">Calculate</button>
+      <div class="result" id="linearResult">Result</div>
+    </div>
+
+  </div>
+
+  <p class="note" style="margin-top:20px">
+    Engineering calculations are provided as a general-purpose toolbox. Verify critical calculations against applicable standards, manufacturer data and a suitably qualified engineer before use in safety-critical applications.
+  </p>
+</section>
+
+<!-- HYDRAULICS -->
+<section id="hydraulics" class="page">
+  <div class="header">
+    <div><h2>Hydraulics</h2><p>Hydraulic system calculations and diagnostic tools.</p></div>
+  </div>
+
+  <div class="calc-grid">
+    <div class="card tool-card">
+      <h3>🛠 Cylinder Force</h3>
+      <div class="field"><label>Pressure (bar)</label><input id="hydPressure" type="number"></div><br>
+      <div class="field"><label>Bore diameter (mm)</label><input id="hydBore" type="number"></div>
+      <button class="btn primary" onclick="calcHydForce()">Calculate</button>
+      <div class="result" id="hydForceResult">Result</div>
+    </div>
+
+    <div class="card tool-card">
+      <h3>💧 Cylinder Speed</h3>
+      <div class="field"><label>Flow (L/min)</label><input id="hydFlow" type="number"></div><br>
+      <div class="field"><label>Bore diameter (mm)</label><input id="hydSpeedBore" type="number"></div>
+      <button class="btn primary" onclick="calcHydSpeed()">Calculate</button>
+      <div class="result" id="hydSpeedResult">Result</div>
+    </div>
+
+    <div class="card tool-card">
+      <h3>⚡ Hydraulic Power</h3>
+      <div class="field"><label>Pressure (bar)</label><input id="hydPowerPressure" type="number"></div><br>
+      <div class="field"><label>Flow (L/min)</label><input id="hydPowerFlow" type="number"></div>
+      <button class="btn primary" onclick="calcHydPower()">Calculate</button>
+      <div class="result" id="hydPowerResult">Result</div>
+    </div>
+
+    <div class="card tool-card">
+      <h3>🔄 Pump Flow</h3>
+      <div class="field"><label>Displacement (cc/rev)</label><input id="pumpDisp" type="number"></div><br>
+      <div class="field"><label>RPM</label><input id="pumpRpm" type="number"></div><br>
+      <div class="field"><label>Efficiency (%)</label><input id="pumpEff" type="number" value="90"></div>
+      <button class="btn primary" onclick="calcPumpFlow()">Calculate</button>
+      <div class="result" id="pumpResult">Result</div>
+    </div>
+
+    <div class="card tool-card">
+      <h3>🔧 Hydraulic Motor Torque</h3>
+      <div class="field"><label>Pressure (bar)</label><input id="motorPressure" type="number"></div><br>
+      <div class="field"><label>Displacement (cc/rev)</label><input id="motorDisp" type="number"></div><br>
+      <div class="field"><label>Efficiency (%)</label><input id="motorEff" type="number" value="90"></div>
+      <button class="btn primary" onclick="calcMotorTorque()">Calculate</button>
+      <div class="result" id="motorResult">Result</div>
+    </div>
+  </div>
+
+  <div class="section-title">Hydraulic Fault-Finding Guide</div>
+  <div class="card">
+    <div class="list">
+      <div class="list-item"><strong>No pressure</strong><br><span class="note">Check oil level, pump drive, pump rotation, inlet restriction, relief valve condition and control/valve configuration.</span></div>
+      <div class="list-item"><strong>Pressure low under load</strong><br><span class="note">Compare commanded pressure with measured pressure. Investigate relief valve, pump condition, internal leakage and system demand.</span></div>
+      <div class="list-item"><strong>Slow cylinder</strong><br><span class="note">Check actual flow, restrictions, valve opening, pump output, hose condition and cylinder leakage.</span></div>
+      <div class="list-item"><strong>Hydraulic overheating</strong><br><span class="note">Investigate excessive pressure drop, relief-valve bypassing, internal leakage, cooler performance and oil condition.</span></div>
+      <div class="list-item"><strong>High case drain</strong><br><span class="note">Compare measured case drain with the manufacturer's allowable specification before condemning a pump or motor.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- MECHANICAL -->
+<section id="mechanical" class="page">
+  <div class="header">
+    <div><h2>Mechanical Engineering</h2><p>Mechanical calculations and workshop reference tools.</p></div>
+  </div>
+
+  <div class="calc-grid">
+    <div class="card tool-card">
+      <h3>Stress</h3>
+      <div class="field"><label>Force (N)</label><input id="stressForce" type="number"></div><br>
+      <div class="field"><label>Area (mm²)</label><input id="stressArea" type="number"></div>
+      <button class="btn primary" onclick="calcStress()">Calculate</button>
+      <div class="result" id="stressResult">Result</div>
+    </div>
+
+    <div class="card tool-card">
+      <h3>Mass from Volume</h3>
+      <div class="field"><label>Density (kg/m³)</label><input id="massDensity" type="number"></div><br>
+      <div class="field"><label>Volume (m³)</label><input id="massVolume" type="number"></div>
+      <button class="btn primary" onclick="calcMass()">Calculate</button>
+      <div class="result" id="massResult">Result</div>
+    </div>
+
+    <div class="card tool-card">
+      <h3>Thermal Expansion</h3>
+      <div class="field"><label>Original length (mm)</label><input id="thermalLength" type="number"></div><br>
+      <div class="field"><label>Expansion coefficient (1/°C)</label><input id="thermalAlpha" type="number" placeholder="e.g. 0.000012"></div><br>
+      <div class="field"><label>Temperature change (°C)</label><input id="thermalTemp" type="number"></div>
+      <button class="btn primary" onclick="calcThermal()">Calculate</button>
+      <div class="result" id="thermalResult">Result</div>
+    </div>
+  </div>
+</section>
+
+<!-- MACHINING -->
+<section id="machining" class="page">
+  <div class="header">
+    <div><h2>Machining Toolbox</h2><p>Turning, milling and drilling calculations.</p></div>
+  </div>
+
+  <div class="calc-grid">
+    <div class="card tool-card">
+      <h3>Lathe RPM</h3>
+      <div class="field"><label>Cutting speed (m/min)</label><input id="turnSpeed" type="number"></div><br>
+      <div class="field"><label>Diameter (mm)</label><input id="turnDia" type="number"></div>
+      <button class="btn primary" onclick="calcTurnRPM()">Calculate</button>
+      <div class="result" id="turnResult">Result</div>
+    </div>
+
+    <div class="card tool-card">
+      <h3>Milling Feed</h3>
+      <div class="field"><label>RPM</label><input id="millRpm" type="number"></div><br>
+      <div class="field"><label>Teeth</label><input id="millTeeth" type="number"></div><br>
+      <div class="field"><label>Feed per tooth (mm/tooth)</label><input id="chipLoad" type="number"></div>
+      <button class="btn primary" onclick="calcMillFeed()">Calculate</button>
+      <div class="result" id="millResult">Result</div>
+    </div>
+
+    <div class="card tool-card">
+      <h3>Drill RPM</h3>
+      <div class="field"><label>Cutting speed (m/min)</label><input id="drillSpeed" type="number"></div><br>
+      <div class="field"><label>Drill diameter (mm)</label><input id="drillDia" type="number"></div>
+      <button class="btn primary" onclick="calcDrillRPM()">Calculate</button>
+      <div class="result" id="drillResult">Result</div>
+    </div>
+
+    <div class="card tool-card">
+      <h3>Tap Drill Reference</h3>
+      <div class="field"><label>Thread nominal diameter (mm)</label><input id="tapDia" type="number"></div><br>
+      <div class="field"><label>Pitch (mm)</label><input id="tapPitch" type="number"></div>
+      <button class="btn primary" onclick="calcTap()">Calculate</button>
+      <div class="result" id="tapResult">Approximate result</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONVERSIONS -->
+<section id="conversions" class="page">
+  <div class="header">
+    <div><h2>Unit Converter</h2><p>Common engineering conversions.</p></div>
+  </div>
+
+  <div class="calc-grid">
+    <div class="card">
+      <h3>Length</h3>
+      <div class="field"><label>Millimetres</label><input id="mmInput" type="number" oninput="convertLength()"></div>
+      <div class="result" id="lengthResult">0 mm = 0 in</div>
+    </div>
+
+    <div class="card">
+      <h3>Pressure</h3>
+      <div class="field"><label>bar</label><input id="barInput" type="number" oninput="convertPressure()"></div>
+      <div class="result" id="pressureResult">0 bar = 0 psi</div>
+    </div>
+
+    <div class="card">
+      <h3>Power</h3>
+      <div class="field"><label>kW</label><input id="kwInput" type="number" oninput="convertPower()"></div>
+      <div class="result" id="kwResult">0 kW = 0 hp</div>
+    </div>
+
+    <div class="card">
+      <h3>Torque</h3>
+      <div class="field"><label>Nm</label><input id="nmInput" type="number" oninput="convertTorque()"></div>
+      <div class="result" id="nmResult">0 Nm = 0 ft-lb</div>
+    </div>
+
+    <div class="card">
+      <h3>Temperature</h3>
+      <div class="field"><label>°C</label><input id="cInput" type="number" oninput="convertTemp()"></div>
+      <div class="result" id="cResult">0 °C = 32 °F</div>
+    </div>
+
+    <div class="card">
+      <h3>Flow</h3>
+      <div class="field"><label>L/min</label><input id="lpmInput" type="number" oninput="convertFlow()"></div>
+      <div class="result" id="lpmResult">0 L/min = 0 GPM</div>
+    </div>
+  </div>
+</section>
+
+<!-- REPORTS -->
+<section id="reports" class="page">
+  <div class="header">
+    <div><h2>Reports</h2><p>Review and print engineering records.</p></div>
+    <button class="btn primary" onclick="window.print()">🖨 Print / Save PDF</button>
+  </div>
+  <div class="grid">
+    <div class="card stat"><div class="label">Total faults</div><div class="value" id="reportFaults">0</div></div>
+    <div class="card stat"><div class="label">Total maintenance</div><div class="value" id="reportMaintenance">0</div></div>
+    <div class="card stat"><div class="label">Safety records</div><div class="value" id="reportSafety">0</div></div>
+    <div class="card stat"><div class="label">Parts</div><div class="value" id="reportParts">0</div></div>
+  </div>
+  <div class="section-title">Engineering Summary</div>
+  <div class="card" id="reportSummary"></div>
+</section>
+
+<!-- TIMELINE -->
+<section id="timeline" class="page">
+  <div class="header">
+    <div><h2>Machine Timeline</h2><p>Chronological engineering history.</p></div>
+  </div>
+  <div class="card">
+    <select id="timelineMachine" onchange="renderTimeline()" style="background:#0b1220;color:white;border:1px solid #263449;padding:10px;border-radius:8px;width:100%;margin-bottom:15px"></select>
+    <div id="timelineList"></div>
+  </div>
+</section>
+
+<!-- REFERENCE -->
+<section id="reference" class="page">
+  <div class="header">
+    <div><h2>Engineering Reference</h2><p>Quick workshop reference.</p></div>
+  </div>
+  <div class="grid">
+    <div class="card"><h3>⚙️ Mechanical</h3><p class="note">Force = mass × acceleration<br>Power = torque × angular velocity<br>Stress = force ÷ area<br>Velocity = distance ÷ time</p></div>
+    <div class="card"><h3>💧 Hydraulics</h3><p class="note">Hydraulic power (kW) ≈ pressure (bar) × flow (L/min) ÷ 600<br>Force = pressure × area</p></div>
+    <div class="card"><h3>🔩 Machining</h3><p class="note">RPM = cutting speed × 1000 ÷ (π × diameter)<br>Milling feed = RPM × teeth × feed/tooth</p></div>
+    <div class="card"><h3>🦺 Safety</h3><p class="note">Always follow the site's isolation procedure, applicable WHS requirements and manufacturer instructions. Stored energy must be identified and controlled before work.</p></div>
+    <div class="card"><h3>📏 Fits & Tolerances</h3><p class="note">Record nominal size, upper limit, lower limit, tolerance and allowance separately. Confirm the required fit from the engineering drawing.</p></div>
+    <div class="card"><h3>🛠 Measurement</h3><p class="note">Record instrument, measurement, units, temperature where relevant and tolerance/specification used for comparison.</p></div>
+  </div>
+</section>
+
+<!-- BACKUP -->
+<section id="backup" class="page">
+  <div class="header">
+    <div><h2>Backup & Data</h2><p>Your records are stored locally in this browser.</p></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>💾 Export Data</h3>
+      <p class="note">Download all machines, maintenance records, faults, safety records, parts and other app data as JSON.</p>
+      <button class="btn primary" onclick="exportData()">Export Backup</button>
+    </div>
+
+    <div class="card">
+      <h3>📥 Import Data</h3>
+      <p class="note">Restore a previously exported Engineering Workbench backup.</p>
+      <input type="file" id="importFile" accept=".json" onchange="importData(event)">
+    </div>
+
+    <div class="card">
+      <h3>⚠️ Reset</h3>
+      <p class="note">Delete all locally stored application data.</p>
+      <button class="btn danger" onclick="resetData()">Delete All Data</button>
+    </div>
+  </div>
+</section>
+
+<div class="footer">Engineering Workbench • Local-first engineering toolkit</div>
+
+</main>
+</div>
+
+<!-- MACHINE MODAL -->
+<div class="modal" id="machineModal">
+<div class="modal-box">
+<div class="modal-head"><h3>Add Machine</h3><button class="close" onclick="closeModal('machineModal')">×</button></div>
+<div class="form-grid">
+<div class="field"><label>Machine ID</label><input id="machineId" placeholder="e.g. HP-001"></div>
+<div class="field"><label>Machine Name</label><input id="machineName" placeholder="Hydraulic Press"></div>
+<div class="field"><label>Manufacturer</label><input id="machineManufacturer"></div>
+<div class="field"><label>Model</label><input id="machineModel"></div>
+<div class="field"><label>Serial Number</label><input id="machineSerial"></div>
+<div class="field"><label>Location</label><input id="machineLocation"></div>
+<div class="field"><label>Criticality</label><select id="machineCriticality"><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div>
+<div class="field"><label>Operating pressure (bar)</label><input id="machinePressure" type="number"></div>
+<div class="field full"><label>Notes</label><textarea id="machineNotes"></textarea></div>
+</div><br>
+<button class="btn primary" onclick="saveMachine()">Save Machine</button>
+</div></div>
+
+<!-- COMPONENT MODAL -->
+<div class="modal" id="componentModal">
+<div class="modal-box">
+<div class="modal-head"><h3>Add Component</h3><button class="close" onclick="closeModal('componentModal')">×</button></div>
+<div class="form-grid">
+<div class="field"><label>Machine</label><select id="componentMachine"></select></div>
+<div class="field"><label>Component Type</label><select id="componentType"><option>Bearing</option><option>Pump</option><option>Motor</option><option>Valve</option><option>Cylinder</option><option>Gearbox</option><option>Coupling</option><option>Other</option></select></div>
+<div class="field"><label>Component ID</label><input id="componentId"></div>
+<div class="field"><label>Manufacturer</label><input id="componentManufacturer"></div>
+<div class="field"><label>Model / Part Number</label><input id="componentModel"></div>
+<div class="field"><label>Serial Number</label><input id="componentSerial"></div>
+<div class="field full"><label>Specifications</label><textarea id="componentSpecs"></textarea></div>
+</div><br>
+<button class="btn primary" onclick="saveComponent()">Save Component</button>
+</div></div>
+
+<!-- PART MODAL -->
+<div class="modal" id="partModal">
+<div class="modal-box">
+<div class="modal-head"><h3>Add Part</h3><button class="close" onclick="closeModal('partModal')">×</button></div>
+<div class="form-grid">
+<div class="field"><label>Part Number</label><input id="partNumber"></div>
+<div class="field"><label>Description</label><input id="partDescription"></div>
+<div class="field"><label>Category</label><input id="partCategory" placeholder="Bearing / seal / hose..."></div>
+<div class="field"><label>Quantity</label><input id="partQuantity" type="number" value="0"></div>
+<div class="field"><label>Minimum Stock</label><input id="partMinimum" type="number" value="0"></div>
+<div class="field"><label>Location</label><input id="partLocation"></div>
+<div class="field full"><label>Notes</label><textarea id="partNotes"></textarea></div>
+</div><br>
+<button class="btn primary" onclick="savePart()">Save Part</button>
+</div></div>
+
+<!-- MAINTENANCE MODAL -->
+<div class="modal" id="maintenanceModal">
+<div class="modal-box">
+<div class="modal-head"><h3>Record Maintenance</h3><button class="close" onclick="closeModal('maintenanceModal')">×</button></div>
+<div class="form-grid">
+<div class="field"><label>Machine</label><select id="maintMachine"></select></div>
+<div class="field"><label>Type</label><select id="maintType"><option>Preventive</option><option>Corrective</option><option>Breakdown</option><option>Inspection</option><option>Lubrication</option></select></div>
+<div class="field"><label>Technician</label><input id="maintTechnician"></div>
+<div class="field"><label>Hours</label><input id="maintHours" type="number"></div>
+<div class="field full"><label>Work performed</label><textarea id="maintWork"></textarea></div>
+<div class="field full"><label>Measurements / findings</label><textarea id="maintFindings"></textarea></div>
+<div class="field full"><label>Recommendations</label><textarea id="maintRecommendations"></textarea></div>
+</div><br>
+<button class="btn primary" onclick="saveMaintenance()">Save Maintenance</button>
+</div></div>
+
+<!-- FAULT MODAL -->
+<div class="modal" id="faultModal">
+<div class="modal-box">
+<div class="modal-head"><h3>New Fault Record</h3><button class="close" onclick="closeModal('faultModal')">×</button></div>
+<div class="form-grid">
+<div class="field"><label>Machine</label><select id="faultMachine"></select></div>
+<div class="field"><label>Discipline</label><select id="faultDiscipline"><option>Mechanical</option><option>Hydraulic</option><option>Pneumatic</option></select></div>
+<div class="field"><label>Priority</label><select id="faultPriority"><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div>
+<div class="field"><label>Technician</label><input id="faultTechnician"></div>
+<div class="field full"><label>Symptom / fault</label><textarea id="faultSymptom"></textarea></div>
+<div class="field full"><label>Diagnostic checks performed</label><textarea id="faultChecks"></textarea></div>
+<div class="field full"><label>Measurements</label><textarea id="faultMeasurements" placeholder="Pressure, flow, temperature, RPM, dimensions, vibration..."></textarea></div>
+<div class="field full"><label>Suspected / confirmed cause</label><textarea id="faultCause"></textarea></div>
+<div class="field full"><label>Corrective action</label><textarea id="faultAction"></textarea></div>
+</div><br>
+<button class="btn warning" onclick="saveFault()">Save Fault</button>
+</div></div>
+
+<!-- JOB MODAL -->
+<div class="modal" id="jobModal">
+<div class="modal-box">
+<div class="modal-head"><h3>New Job</h3><button class="close" onclick="closeModal('jobModal')">×</button></div>
+<div class="form-grid">
+<div class="field"><label>Machine</label><select id="jobMachine"></select></div>
+<div class="field"><label>Job Type</label><select id="jobType"><option>Maintenance</option><option>Breakdown</option><option>Inspection</option><option>Engineering</option><option>Modification</option></select></div>
+<div class="field"><label>Priority</label><select id="jobPriority"><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div>
+<div class="field"><label>Assigned To</label><input id="jobAssigned"></div>
+<div class="field full"><label>Description</label><textarea id="jobDescription"></textarea></div>
+</div><br>
+<button class="btn primary" onclick="saveJob()">Save Job</button>
+</div></div>
+
+<!-- SAFETY MODAL -->
+<div class="modal" id="safetyModal">
+<div class="modal-box">
+<div class="modal-head"><h3>Safety Record</h3><button class="close" onclick="closeModal('safetyModal')">×</button></div>
+<p class="note">Use this record with your workplace safety and isolation procedures.</p>
+<div class="form-grid">
+<div class="field"><label>Machine</label><select id="modalSafetyMachine"></select></div>
+<div class="field"><label>Person</label><input id="modalSafetyPerson"></div>
+<div class="field full"><label>Task</label><textarea id="modalSafetyTask"></textarea></div>
+<div class="field full"><label>Hazards and controls</label><textarea id="modalSafetyHazards"></textarea></div>
+</div><br>
+<button class="btn success" onclick="saveModalSafety()">Save Safety Record</button>
+</div></div>
+
+<script>
+const KEY="engineeringWorkbenchData";
+
+let db=JSON.parse(localStorage.getItem(KEY)||"null")||{
+ machines:[],
+ components:[],
+ parts:[],
+ maintenance:[],
+ faults:[],
+ safety:[],
+ jobs:[],
+ activity:[]
+};
+
+function saveDB(){
+  localStorage.setItem(KEY,JSON.stringify(db));
+  updateDashboard();
+}
+
+function id(){
+  return Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+}
+
+function now(){
+  return new Date().toLocaleString();
+}
+
+function addActivity(type,text){
+  db.activity.unshift({id:id(),type,text,date:now()});
+  db.activity=db.activity.slice(0,50);
+}
+
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[m]));
+}
+
+function showPage(page,btn){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(page).classList.add("active");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+  if(btn)btn.classList.add("active");
+  refreshPage(page);
+  if(window.innerWidth<=700)document.getElementById("sidebar").classList.remove("open");
+}
+
+function refreshPage(page){
+  if(page==="dashboard")updateDashboard();
+  if(page==="machines")renderMachines();
+  if(page==="components")renderComponents();
+  if(page==="parts")renderParts();
+  if(page==="maintenance")renderMaintenance();
+  if(page==="faults")renderFaults();
+  if(page==="safety")renderSafety();
+  if(page==="jobs")renderJobs();
+  if(page==="reports")renderReports();
+  if(page==="timeline")renderTimeline();
+  populateMachineSelects();
+}
+
+function toggleSidebar(){
+  document.getElementById("sidebar").classList.toggle("open");
+}
+
+function openModal(x){document.getElementById(x).classList.add("open")}
+function closeModal(x){document.getElementById(x).classList.remove("open")}
+
+function openMachineModal(){openModal("machineModal")}
+function openComponentModal(){populateMachineSelects();openModal("componentModal")}
+function openPartModal(){openModal("partModal")}
+function openMaintenanceModal(){populateMachineSelects();openModal("maintenanceModal")}
+function openFaultModal(){populateMachineSelects();openModal("faultModal")}
+function openJobModal(){populateMachineSelects();openModal("jobModal")}
+function openSafetyModal(){populateMachineSelects();openModal("safetyModal")}
+
+function populateMachineSelects(){
+  const ids=[
+    "componentMachine","maintMachine","faultMachine","jobMachine",
+    "safetyMachine","timelineMachine","modalSafetyMachine"
+  ];
+  ids.forEach(x=>{
+    const el=document.getElementById(x);
+    if(!el)return;
+    const current=el.value;
+    el.innerHTML='<option value="">Select machine</option>'+
+      db.machines.map(m=>`<option value="${m.id}">${esc(m.id)} — ${esc(m.name)}</option>`).join("");
+    if(current)el.value=current;
+  });
+}
+
+function updateDashboard(){
+  document.getElementById("statMachines").textContent=db.machines.length;
+  document.getElementById("statFaults").textContent=db.faults.filter(x=>x.status!=="Closed").length;
+  document.getElementById("statMaintenance").textContent=db.maintenance.length;
+  document.getElementById("statSafety").textContent=db.safety.length;
+
+  const a=document.getElementById("recentActivity");
+  if(!db.activity.length){
+    a.innerHTML='<div class="empty">No activity yet. Start by adding a machine.</div>';
+  }else{
+    a.innerHTML=db.activity.slice(0,8).map(x=>
+      `<div class="list-item"><strong>${esc(x.type)}</strong><br>${esc(x.text)}<br><span class="note">${esc(x.date)}</span></div>`
+    ).join("");
+  }
+}
+
+function saveMachine(){
+  const m={
+    id:id(),machineId:val("machineId"),name:val("machineName"),
+    manufacturer:val("machineManufacturer"),model:val("machineModel"),
+    serial:val("machineSerial"),location:val("machineLocation"),
+    criticality:val("machineCriticality"),pressure:val("machinePressure"),
+    notes:val("machineNotes"),created:now()
+  };
+  if(!m.machineId||!m.name)return alert("Machine ID and Machine Name are required.");
+  db.machines.push(m);
+  addActivity("Machine",`Added ${m.machineId} — ${m.name}`);
+  saveDB();
+  closeModal("machineModal");
+  clearForm("machineModal");
+  renderMachines();
+}
+
+function renderMachines(search=""){
+  const rows=db.machines.filter(m=>
+    JSON.stringify(m).toLowerCase().includes(search.toLowerCase())
+  );
+  const el=document.getElementById("machinesTable");
+  if(!rows.length){el.innerHTML='<div class="empty">No machines recorded.</div>';return}
+  el.innerHTML=`<div class="table-wrap"><table><thead><tr>
+  <th>ID</th><th>Machine</th><th>Manufacturer</th><th>Location</th><th>Criticality</th><th>Action</th>
+  </tr></thead><tbody>${rows.map(m=>`
+  <tr>
+  <td><strong>${esc(m.machineId)}</strong></td>
+  <td>${esc(m.name)}<br><span class="note">${esc(m.model)}</span></td>
+  <td>${esc(m.manufacturer)}</td>
+  <td>${esc(m.location)}</td>
+  <td><span class="badge ${m.criticality==="Critical"?"danger":m.criticality==="High"?"warning":"info"}">${esc(m.criticality)}</span></td>
+  <td><button class="btn" onclick="machineHistory('${m.id}')">History</button> <button class="btn danger" onclick="deleteItem('machines','${m.id}')">Delete</button></td>
+  </tr>`).join("")}</tbody></table></div>`;
+}
+
+function saveComponent(){
+  const x={
+    id:id(),machineId:val("componentMachine"),type:val("componentType"),
+    componentId:val("componentId"),manufacturer:val("componentManufacturer"),
+    model:val("componentModel"),serial:val("componentSerial"),specs:val("componentSpecs"),created:now()
+  };
+  if(!x.machineId||!x.componentId)return alert("Machine and Component ID are required.");
+  db.components.push(x);
+  addActivity("Component",`Added ${x.type} ${x.componentId}`);
+  saveDB();closeModal("componentModal");clearForm("componentModal");renderComponents();
+}
+
+function renderComponents(){
+  const el=document.getElementById("componentsTable");
+  if(!db.components.length){el.innerHTML='<div class="empty">No components recorded.</div>';return}
+  el.innerHTML=`<div class="table-wrap"><table><thead><tr>
+  <th>Machine</th><th>Type</th><th>ID</th><th>Manufacturer</th><th>Model</th><th>Action</th>
+  </tr></thead><tbody>${db.components.map(x=>{
+    const m=db.machines.find(a=>a.id===x.machineId);
+    return `<tr><td>${esc(m?.machineId||"—")}</td><td>${esc(x.type)}</td><td>${esc(x.componentId)}</td><td>${esc(x.manufacturer)}</td><td>${esc(x.model)}</td><td><button class="btn danger" onclick="deleteItem('components','${x.id}')">Delete</button></td></tr>`
+  }).join("")}</tbody></table></div>`;
+}
+
+function savePart(){
+  const x={
+    id:id(),number:val("partNumber"),description:val("partDescription"),
+    category:val("partCategory"),quantity:Number(val("partQuantity"))||0,
+    minimum:Number(val("partMinimum"))||0,location:val("partLocation"),
+    notes:val("partNotes"),created:now()
+  };
+  if(!x.number||!x.description)return alert("Part number and description are required.");
+  db.parts.push(x);
+  addActivity("Part",`Added ${x.number} — ${x.description}`);
+  saveDB();closeModal("partModal");clearForm("partModal");renderParts();
+}
+
+function renderParts(){
+  const el=document.getElementById("partsTable");
+  if(!db.parts.length){el.innerHTML='<div class="empty">No parts recorded.</div>';return}
+  el.innerHTML=`<div class="table-wrap"><table><thead><tr>
+  <th>Part</th><th>Description</th><th>Category</th><th>Qty</th><th>Min</th><th>Status</th><th>Action</th>
+  </tr></thead><tbody>${db.parts.map(x=>{
+    const low=x.quantity<=x.minimum;
+    return `<tr><td>${esc(x.number)}</td><td>${esc(x.description)}</td><td>${esc(x.category)}</td><td>${x.quantity}</td><td>${x.minimum}</td><td><span class="badge ${low?"danger":"success"}">${low?"REORDER":"OK"}</span></td><td><button class="btn danger" onclick="deleteItem('parts','${x.id}')">Delete</button></td></tr>`
+  }).join("")}</tbody></table></div>`;
+}
+
+function saveMaintenance(){
+  const x={
+    id:id(),machineId:val("maintMachine"),type:val("maintType"),
+    technician:val("maintTechnician"),hours:Number(val("maintHours"))||0,
+    work:val("maintWork"),findings:val("maintFindings"),
+    recommendations:val("maintRecommendations"),date:now()
+  };
+  if(!x.machineId||!x.work)return alert("Machine and work performed are required.");
+  db.maintenance.push(x);
+  addActivity("Maintenance",`Maintenance recorded for ${machineName(x.machineId)}`);
+  saveDB();closeModal("maintenanceModal");clearForm("maintenanceModal");renderMaintenance();
+}
+
+function renderMaintenance(){
+  const el=document.getElementById("maintenanceTable");
+  if(!db.maintenance.length){el.innerHTML='<div class="empty">No maintenance records.</div>';return}
+  el.innerHTML=`<div class="table-wrap"><table><thead><tr>
+  <th>Date</th><th>Machine</th><th>Type</th><th>Technician</th><th>Hours</th><th>Work</th><th>Action</th>
+  </tr></thead><tbody>${db.maintenance.map(x=>`
+  <tr><td>${esc(x.date)}</td><td>${esc(machineName(x.machineId))}</td><td>${esc(x.type)}</td><td>${esc(x.technician)}</td><td>${x.hours}</td><td>${esc(x.work)}</td><td><button class="btn danger" onclick="deleteItem('maintenance','${x.id}')">Delete</button></td></tr>`
+  ).join("")}</tbody></table></div>`;
+}
+
+function saveFault(){
+  const x={
+    id:id(),machineId:val("faultMachine"),discipline:val("faultDiscipline"),
+    priority:val("faultPriority"),technician:val("faultTechnician"),
+    symptom:val("faultSymptom"),checks:val("faultChecks"),
+    measurements:val("faultMeasurements"),cause:val("faultCause"),
+    action:val("faultAction"),status:"Open",date:now()
+  };
+  if(!x.machineId||!x.symptom)return alert("Machine and symptom are required.");
+  db.faults.push(x);
+  addActivity("Fault",`${x.discipline} fault recorded on ${machineName(x.machineId)}`);
+  saveDB();closeModal("faultModal");clearForm("faultModal");renderFaults();
+}
+
+function renderFaults(){
+  const el=document.getElementById("faultsTable");
+  if(!db.faults.length){el.innerHTML='<div class="empty">No faults recorded.</div>';return}
+  el.innerHTML=`<div class="table-wrap"><table><thead><tr>
+  <th>Date</th><th>Machine</th><th>Discipline</th><th>Priority</th><th>Symptom</th><th>Status</th><th>Action</th>
+  </tr></thead><tbody>${db.faults.map(x=>`
+  <tr><td>${esc(x.date)}</td><td>${esc(machineName(x.machineId))}</td><td>${esc(x.discipline)}</td><td><span class="badge ${x.priority==="Critical"?"danger":x.priority==="High"?"warning":"info"}">${esc(x.priority)}</span></td><td>${esc(x.symptom)}</td><td><span class="badge ${x.status==="Closed"?"success":"danger"}">${x.status}</span></td><td><button class="btn success" onclick="closeFault('${x.id}')">Close</button> <button class="btn danger" onclick="deleteItem('faults','${x.id}')">Delete</button></td></tr>`
+  ).join("")}</tbody></table></div>`;
+}
+
+function closeFault(id){
+  const x=db.faults.find(a=>a.id===id);
+  if(!x)return;
+  x.status="Closed";
+  x.closed=now();
+  addActivity("Fault closed",`${x.discipline} fault on ${machineName(x.machineId)}`);
+  saveDB();renderFaults();
+}
+
+function saveJob(){
+  const x={
+    id:id(),machineId:val("jobMachine"),type:val("jobType"),
+    priority:val("jobPriority"),assigned:val("jobAssigned"),
+    description:val("jobDescription"),status:"Open",date:now()
+  };
+  if(!x.machineId||!x.description)return alert("Machine and description are required.");
+  db.jobs.push(x);
+  addActivity("Job",`New ${x.type} job for ${machineName(x.machineId)}`);
+  saveDB();closeModal("jobModal");clearForm("jobModal");renderJobs();
+}
+
+function renderJobs(){
+  const el=document.getElementById("jobsTable");
+  if(!db.jobs.length){el.innerHTML='<div class="empty">No jobs recorded.</div>';return}
+  el.innerHTML=`<div class="table-wrap"><table><thead><tr>
+  <th>Date</th><th>Machine</th><th>Type</th><th>Priority</th><th>Assigned</th><th>Status</th><th>Action</th>
+  </tr></thead><tbody>${db.jobs.map(x=>`
+  <tr><td>${esc(x.date)}</td><td>${esc(machineName(x.machineId))}</td><td>${esc(x.type)}</td><td>${esc(x.priority)}</td><td>${esc(x.assigned)}</td><td><span class="badge ${x.status==="Closed"?"success":"warning"}">${x.status}</span></td><td><button class="btn success" onclick="closeJob('${x.id}')">Close</button> <button class="btn danger" onclick="deleteItem('jobs','${x.id}')">Delete</button></td></tr>`
+  ).join("")}</tbody></table></div>`;
+}
+
+function closeJob(id){
+  const x=db.jobs.find(a=>a.id===id);
+  if(!x)return;
+  x.status="Closed";x.closed=now();
+  addActivity("Job closed",x.description);
+  saveDB();renderJobs();
+}
+
+function saveSafety(){
+  const checks=[...document.querySelectorAll(".safeCheck")].map(x=>x.checked);
+  const x={
+    id:id(),machineId:val("safetyMachine"),task:val("safetyTask"),
+    hazards:val("safetyHazards"),checks,person:val("safetyPerson"),date:now()
+  };
+  if(!x.machineId||!x.person)return alert("Machine and person are required.");
+  if(checks.some(x=>!x))return alert("Complete every checklist item before saving.");
+  db.safety.push(x);
+  addActivity("Safety",`Safety check completed for ${machineName(x.machineId)}`);
+  saveDB();renderSafety();
+}
+
+function saveModalSafety(){
+  const x={
+    id:id(),machineId:val("modalSafetyMachine"),person:val("modalSafetyPerson"),
+    task:val("modalSafetyTask"),hazards:val("modalSafetyHazards"),
+    checks:[],date:now()
+  };
+  if(!x.machineId||!x.person)return alert("Machine and person are required.");
+  db.safety.push(x);
+  addActivity("Safety",`Safety record created for ${machineName(x.machineId)}`);
+  saveDB();closeModal("safetyModal");clearForm("safetyModal");renderSafety();
+}
+
+function renderSafety(){
+  const el=document.getElementById("safetyTable");
+  if(!db.safety.length){el.innerHTML='<div class="empty">No safety records.</div>';return}
+  el.innerHTML=`<div class="table-wrap"><table><thead><tr>
+  <th>Date</th><th>Machine</th><th>Task</th><th>Person</th><th>Checks</th><th>Action</th>
+  </tr></thead><tbody>${db.safety.map(x=>`
+  <tr><td>${esc(x.date)}</td><td>${esc(machineName(x.machineId))}</td><td>${esc(x.task)}</td><td>${esc(x.person)}</td><td>${x.checks?.length?x.checks.filter(Boolean).length+"/"+x.checks.length:"Recorded"}</td><td><button class="btn danger" onclick="deleteItem('safety','${x.id}')">Delete</button></td></tr>`
+  ).join("")}</tbody></table></div>`;
+}
+
+function loadDiagnostic(type){
+  const guides={
+    hydraulic:[
+      "1. Confirm the symptom and operating conditions.",
+      "2. Verify oil level, temperature and condition.",
+      "3. Measure pressure at appropriate test points.",
+      "4. Determine whether the issue is pressure, flow or both.",
+      "5. Check pump output/case drain against manufacturer specifications.",
+      "6. Check relief/control valves.",
+      "7. Check actuator/internal leakage.",
+      "8. Record measurements before replacing components."
+    ],
+    mechanical:[
+      "1. Confirm symptom and operating conditions.",
+      "2. Inspect for loose, damaged or missing components.",
+      "3. Check lubrication and contamination.",
+      "4. Check temperature and vibration where appropriate.",
+      "5. Check alignment and coupling condition.",
+      "6. Check bearing/shaft condition.",
+      "7. Compare dimensions to drawing/specification.",
+      "8. Identify root cause before repair."
+    ],
+    pneumatic:[
+      "1. Verify supply pressure.",
+      "2. Check regulator/filter condition.",
+      "3. Inspect for leaks.",
+      "4. Check valve operation.",
+      "5. Check flow controls.",
+      "6. Check cylinder seals and mechanical load.",
+      "7. Measure pressure during operation.",
+      "8. Compare results with manufacturer requirements."
+    ]
+  };
+  alert(guides[type].join("\n"));
+}
+
+function machineHistory(mid){
+  const m=db.machines.find(x=>x.id===mid);
+  showPage("timeline");
+  document.getElementById("timelineMachine").value=mid;
+  renderTimeline();
+}
+
+function renderTimeline(){
+  const mid=document.getElementById("timelineMachine")?.value;
+  const el=document.getElementById("timelineList");
+  if(!mid){el.innerHTML='<div class="empty">Select a machine.</div>';return}
+  const events=[];
+  db.maintenance.filter(x=>x.machineId===mid).forEach(x=>events.push({date:x.date,type:"Maintenance",text:x.work}));
+  db.faults.filter(x=>x.machineId===mid).forEach(x=>events.push({date:x.date,type:"Fault",text:x.symptom}));
+  db.safety.filter(x=>x.machineId===mid).forEach(x=>events.push({date:x.date,type:"Safety",text:x.task}));
+  db.jobs.filter(x=>x.machineId===mid).forEach(x=>events.push({date:x.date,type:"Job",text:x.description}));
+  if(!events.length){el.innerHTML='<div class="empty">No history for this machine.</div>';return}
+  el.innerHTML=events.map(x=>`<div class="list-item"><strong>${esc(x.type)}</strong> — ${esc(x.date)}<br>${esc(x.text)}</div>`).join("");
+}
+
+function renderReports(){
+  document.getElementById("reportFaults").textContent=db.faults.length;
+  document.getElementById("reportMaintenance").textContent=db.maintenance.length;
+  document.getElementById("reportSafety").textContent=db.safety.length;
+  document.getElementById("reportParts").textContent=db.parts.length;
+  const open=db.faults.filter(x=>x.status!=="Closed").length;
+  const critical=db.faults.filter(x=>x.priority==="Critical"&&x.status!=="Closed").length;
+  document.getElementById("reportSummary").innerHTML=`
+  <h3>Current Engineering Summary</h3>
+  <p>Machines registered: <strong>${db.machines.length}</strong></p>
+  <p>Open faults: <strong>${open}</strong></p>
+  <p>Critical open faults: <strong>${critical}</strong></p>
+  <p>Maintenance records: <strong>${db.maintenance.length}</strong></p>
+  <p>Safety records: <strong>${db.safety.length}</strong></p>
+  <p>Inventory items: <strong>${db.parts.length}</strong></p>
+  `;
+}
+
+function calcForce(){
+  const r=n("forceMass")*n("forceAccel");
+  result("forceResult",`${r.toFixed(2)} N`);
+}
+function calcTorque(){
+  const r=n("torqueForce")*n("torqueArm");
+  result("torqueResult",`${r.toFixed(2)} Nm`);
+}
+function calcPower(){
+  const r=(n("powerTorque")*2*Math.PI*n("powerRpm")/60)/1000;
+  result("powerResult",`${r.toFixed(3)} kW`);
+}
+function calcShaftStress(){
+  const T=n("shaftTorque")*1000;
+  const d=n("shaftDiameter");
+  const r=16*T/(Math.PI*Math.pow(d,3));
+  result("shaftResult",`${r.toFixed(2)} MPa`);
+}
+function calcGear(){
+  const r=n("gearDriven")/n("gearDriver");
+  result("gearResult",`${r.toFixed(3)} : 1`);
+}
+function calcLinear(){
+  const r=Math.PI*(n("linearDia")/1000)*n("linearRpm")/60;
+  result("linearResult",`${r.toFixed(3)} m/s`);
+}
+function calcHydForce(){
+  const area=Math.PI*Math.pow(n("hydBore")/1000,2)/4;
+  const force=n("hydPressure")*100000*area;
+  result("hydForceResult",`${(force/1000).toFixed(2)} kN`);
+}
+function calcHydSpeed(){
+  const area=Math.PI*Math.pow(n("hydSpeedBore")/1000,2)/4;
+  const flow=n("hydFlow")/60000;
+  const speed=flow/area;
+  result("hydSpeedResult",`${speed.toFixed(3)} m/s`);
+}
+function calcHydPower(){
+  const r=n("hydPowerPressure")*n("hydPowerFlow")/600;
+  result("hydPowerResult",`${r.toFixed(3)} kW`);
+}
+function calcPumpFlow(){
+  const r=n("pumpDisp")*n("pumpRpm")*n("pumpEff")/100/1000;
+  result("pumpResult",`${r.toFixed(2)} L/min`);
+}
+function calcMotorTorque(){
+  const r=(n("motorPressure")*100000*n("motorDisp")/1000000)/(2*Math.PI)*(n("motorEff")/100);
+  result("motorResult",`${r.toFixed(2)} Nm`);
+}
+function calcStress(){
+  const r=n("stressForce")/n("stressArea");
+  result("stressResult",`${r.toFixed(2)} MPa`);
+}
+function calcMass(){
+  const r=n("massDensity")*n("massVolume");
+  result("massResult",`${r.toFixed(3)} kg`);
+}
+function calcThermal(){
+  const r=n("thermalLength")*n("thermalAlpha")*n("thermalTemp");
+  result("thermalResult",`${r.toFixed(3)} mm expansion`);
+}
+function calcTurnRPM(){
+  const r=n("turnSpeed")*1000/(Math.PI*n("turnDia"));
+  result("turnResult",`${Math.round(r)} RPM`);
+}
+function calcMillFeed(){
+  const r=n("millRpm")*n("millTeeth")*n("chipLoad");
+  result("millResult",`${r.toFixed(1)} mm/min`);
+}
+function calcDrillRPM(){
+  const r=n("drillSpeed")*1000/(Math.PI*n("drillDia"));
+  result("drillResult",`${Math.round(r)} RPM`);
+}
+function calcTap(){
+  const r=n("tapDia")-n("tapPitch");
+  result("tapResult",`${r.toFixed(2)} mm approximate tap drill`);
+}
+function convertLength(){
+  const x=n("mmInput");document.getElementById("lengthResult").textContent=`${x} mm = ${(x/25.4).toFixed(4)} in`;
+}
+function convertPressure(){
+  const x=n("barInput");document.getElementById("pressureResult").textContent=`${x} bar = ${(x*14.5038).toFixed(2)} psi`;
+}
+function convertPower(){
+  const x=n("kwInput");document.getElementById("kwResult").textContent=`${x} kW = ${(x*1.34102).toFixed(3)} hp`;
+}
+function convertTorque(){
+  const x=n("nmInput");document.getElementById("nmResult").textContent=`${x} Nm = ${(x*0.737562).toFixed(3)} ft-lb`;
+}
+function convertTemp(){
+  const x=n("cInput");document.getElementById("cResult").textContent=`${x} °C = ${(x*9/5+32).toFixed(2)} °F`;
+}
+function convertFlow(){
+  const x=n("lpmInput");document.getElementById("lpmResult").textContent=`${x} L/min = ${(x*0.264172).toFixed(3)} GPM`;
+}
+
+function n(id){return Number(document.getElementById(id).value)||0}
+function val(id){return document.getElementById(id)?.value?.trim()||""}
+function result(id,text){document.getElementById(id).innerHTML=`<strong>${text}</strong>`}
+
+function machineName(id){
+  const m=db.machines.find(x=>x.id===id);
+  return m?`${m.machineId} — ${m.name}`:"Unknown machine";
+}
+
+function clearForm(modalId){
+  const modal=document.getElementById(modalId);
+  modal.querySelectorAll("input,textarea").forEach(x=>{
+    if(x.type!=="file")x.value="";
+  });
+}
+
+function deleteItem(collection,itemId){
+  if(!confirm("Delete this record?"))return;
+  db[collection]=db[collection].filter(x=>x.id!==itemId);
+  addActivity("Record deleted",collection);
+  saveDB();
+  refreshPage(document.querySelector(".page.active").id);
+}
+
+function exportData(){
+  const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`engineering-workbench-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importData(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const imported=JSON.parse(reader.result);
+      if(!imported.machines||!imported.faults)throw new Error();
+      if(confirm("Replace current data with this backup?")){
+        db=imported;
+        saveDB();
+        alert("Backup restored.");
+        location.reload();
+      }
+    }catch{
+      alert("Invalid Engineering Workbench backup.");
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetData(){
+  if(!confirm("This will permanently delete all local app data. Continue?"))return;
+  localStorage.removeItem(KEY);
+  location.reload();
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  updateDashboard();
+  populateMachineSelects();
+});
+</script>
+
+</body>
+</html>
